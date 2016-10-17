@@ -27,7 +27,7 @@ class Train:
         lrm = LogisticRegressionWithLBFGS.train(job.sc.parallelize(a))
 
 
-        lrm.save(mist.job.sc, "/tmp/brakeModel")
+        lrm.save(job.sc, "/tmp/brakeModel")
 
         return 1
 
