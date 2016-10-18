@@ -1,35 +1,36 @@
-import mist
-import os
-import numpy as np
 import pandas as pd
-import math
-from numpy import array
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionWithLBFGS
+import locale
+locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' ) 
 
-class Train:
+df = pd.read_csv('/root/hydrosphere/brakedata.csv', header=None, sep= ' ')
+slice=df.ix[:,1:3]
 
-    def __init__(self, job):
-        job.sendResult(self.runModel(job))
+slice.columns=['mileage','weight','efficiency']
 
-    def runModel(self, job):
-        val = job.parameters.values()
-        heatKm = pd.DataFrame({'worn' : 0, 'heat' : np.random.random_integers(200,size=(100)), 'km' : np.random.random_integers(20000,size=(100))})
-        a = []
-        for index,row in heatKm.iterrows():
-            heat = row['heat']
-            km = row['km']
-            z = (.002 * heat) + (0.0015 * km) - 3
-            pr = 1 / (1 + (math.e**-z))
-            worn = pr > 0.5
-            a.append(LabeledPoint(worn,array([heat, km])))
-            print (heat,km,z,pr,worn)
-        lrm = LogisticRegressionWithLBFGS.train(job.sc.parallelize(a))
+a = [] 
 
+def parsePoint(m,w,e):
+    worn = e < 0.5
+    return LabeledPoint(worn, [mileage, weight])
 
-        lrm.save(job.sc, "/tmp/brakeModel")
+for row in slice.itertuples():
+	mileage = locale.atof(getattr(row, 'mileage'))
+	weight = locale.atof(getattr(row, 'weight'))
+	efficiency = getattr(row,'efficiency')
+	lp = parsePoint (mileage, weight, efficiency)
+	a.append(lp)
 
-        return 1
+lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
 
+for x in a:
+    print (x.label, x.features)
 
-train = Train(mist.Job())
+p = sc.parallelize(a)
+
+valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
+
+accurate = valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
+
+ 
