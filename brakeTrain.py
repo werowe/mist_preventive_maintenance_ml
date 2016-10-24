@@ -25,7 +25,7 @@ for row in brakeData.itertuples():
 	a.append(lp)
 
 lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
-lrm.save(mist.job.sc, "/tmp/brakeModel")
+lrm.save(sc, "/tmp/brakeModel")
 
 
 p = sc.parallelize(a)
