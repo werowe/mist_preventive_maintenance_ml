@@ -2,35 +2,39 @@ import pandas as pd
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionWithLBFGS
 import locale
+import math
 locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' ) 
 
-df = pd.read_csv('/root/hydrosphere/brakedata.csv', header=None, sep= ' ')
-slice=df.ix[:,1:3]
 
-slice.columns=['mileage','weight','efficiency']
+df = pd.read_csv('/home/walker/hydrosphere/brakedata.csv', sep= ',')
+ 
+brakeData =  df.ix[:,0:3]
+
 
 a = [] 
 
-def parsePoint(m,w,e):
-    worn = e < 0.5
-    return LabeledPoint(worn, [mileage, weight])
+def parsePoint(w,k,h):
+    return LabeledPoint(worn, [km, heat])
 
-for row in slice.itertuples():
-	mileage = locale.atof(getattr(row, 'mileage'))
-	weight = locale.atof(getattr(row, 'weight'))
-	efficiency = getattr(row,'efficiency')
-	lp = parsePoint (mileage, weight, efficiency)
+
+for row in brakeData.itertuples():
+	worn = getattr(row, 'worn')
+	km = locale.atof(getattr(row, 'km'))
+	heat = getattr(row,'heat')
+	lp = parsePoint (worn, km, heat)
 	a.append(lp)
 
 lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
+lrm.save(mist.job.sc, "/tmp/brakeModel")
 
-for x in a:
-    print (x.label, x.features)
 
 p = sc.parallelize(a)
 
 valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
 
-accurate = valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
+
+accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
 
  
+
+

@@ -28,7 +28,7 @@ class Predict:
         heat = pylist[0]
         km = pylist[1]
         lrm = LogisticRegressionModel.load(job.sc, "/tmp/brakeModel")
-        worn = lrm.predict([heat, km])
+        worn = lrm.predict([km,heat])
         return ("brake is worn=", worn)
       
 
