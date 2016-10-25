@@ -72,7 +72,7 @@ There are lots of factors that impact brake wear.  For example, brakes will wear
 We do not have any actual sample data.  So we generated some sample date using this rough model:
 
 
-z = wear_rate = (0.003 *heat)+(0.004*kilometers)-78
+z = wear_rate = (0.003 * heat) + (0.004 * kilometers)-78
 
 
 This shows whether the brakes are worn out given the kilometers driven and the maximum heat generated during gathering the sample.
