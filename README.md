@@ -1,26 +1,18 @@
-Spark ML and Hydrosphere Mist Example: Preventive Maintenance
+# Spark ML and Hydrosphere Mist Example: Preventive Maintenance
 
 
+## Document reference: 
+1. Hydrosphere Mist install instructions are here
+2. Hydrosphere Mist readme.
+3. Other example Python code is here.
  
 
 
+## Table of Contents
 
-
-Document reference: 
-Hydrosphere Mist install instructions are here
-Hydrosphere Mist readme.
-Other example Python code is here.
-“Brake Wear and Performance Test Final Report” from US Department of Transportation.
-Read this tutorial for reference and Spark ML lib documentation since MapR tutorial uses old Spark RDD API
-
-
-Table of Contents
-
-
-
-
+ 
 Spark ML and Hydrosphere Mist Example: Preventive Maintenance	1
-Business Assessment: Use Case Background	2
+[Business Assessment: Use Case Background]
 Vehicle Fleets and Analytics	2
 Brake Failure Prediction	2
 Brake Pad Maintenance	2
@@ -49,25 +41,25 @@ Evaluate the model for accuracy.
 Below we discuss the code in depth.  But first we give a use case for why this is needed.
 
 
-Business Assessment: Use Case Background
+## Business Assessment: Use Case Background
 PM was one of the early adopters of big data analytics and machine learning and IoT (Internet of Things) because it is so simple to conceive and implement for that use case.  Calculating when a machine needs maintenance is a problem that fits neatly into a predictive algorithm. This is because machine wear is a function of time and usage.  
 
 
-Vehicle Fleets and Analytics
+## Vehicle Fleets and Analytics
 IoT-equipped trucks send data from vehicles using a cellular or satellite signal either as a stream or in bursts.  With IoT, trucks are fit with sensors and GPS trackers that measure heat, vibration, distance travelled, speed, etc.  These are attached to the engine, brakes, transmission, refrigerated trailer, etc.
 
 
 Companies gather and study this data to operate their vehicles in the safest and lowest cost manner possible.  For example, sensors on the engine can tell whether the engine has a problem.  It is the goal of PM to fix a device before it breaks as waiting until it breaks is expensive as the engine, brake assembly, or drive train can be destroyed and the vehicle taken out of service for a longer period of time than if it is properly maintained
 
 
-Brake Failure Prediction
+## Brake Failure Prediction
 A heavy truck with 18 wheels has a unique preventive maintenance problem to solve, and that is knowing when to change brakes.  Trucks needs to know when to replace their brakes so that they do not have an accident or destroy the brake rotor, which is the metal part of the assembly.  If they wait too long the brake pad will destroy the rotor as metal rubs up against metal.   
 
 
 The driver cannot be expected to check every brake every time they stop.  And if the company just changes brakes based on some preset schedule then they are wasting money, because they might be changing them too often. So it is preferred to write some mathematical or statistical model to predict when brakes should be changed.  
 
 
-Brake Pad Maintenance
+## Brake Pad Maintenance
 Brake pads are metal shavings held together by a resin. The brake applies pressure to the pad to force it down on the rotor, which is a metal disk connected to a truck’s axles.  The pad is designed to wear out over time.  It has to be softer than the rotor, so that it does not damage the rotor.   When the brake pad wears down, heat will go up because there is more friction.  And the further a vehicle has been driven the more its brakes will have worn down.
 
 
@@ -80,9 +72,7 @@ There are lots of factors that impact brake wear.  For example, brakes will wear
 We do not have any actual sample data.  So we generated some sample date using this rough model:
 
 
-
-
-z = wear_rate = =(0.003 *heat)+(0.004*kilometers)-78
+> z = wear_rate = =(0.003 *heat)+(0.004*kilometers)-78
 
 
 This shows whether the brakes are worn out given the kilometers driven and the maximum heat generated during gathering the sample.
@@ -98,78 +88,12 @@ pr =1 / (1 + e-z)
 
 The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise logit = 0. If worn = 1 then time to change brake pads.
 
+## Sample Data Goes Here
 
-
-
-worn
-km
-heat
-z
-pr
-1
-20,000
-240
-2.72
-0.938197
-0
-5,000
-98
--57.706
-0.000000
-1
-50,000
-140
-122.42
-1.000000
-0
-8,000
-260
--45.22
-0.000000
-0
-15,966
-263
--13.347
-0.000002
-1
-27,110
-201
-31.043
-1.000000
-0
-16,018
-189
--13.361
-0.000002
-1
-28,792
-232
-37.864
-1.000000
-1
-22,002
-201
-10.611
-0.999975
-0
-10,227
-175
--36.567
-0.000000
-0
-13,663
-183
--22.799
-0.000000
-0
-8,273
-264
--44.116
-0.000000
 
 
  
-Model Serving
+## Model Serving
 We expose the data model as a web service for enterprise applications.  
 
 
@@ -188,21 +112,18 @@ We can run Mist as a Docker image of install it locally.  We install it locally 
  
 
 
-mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar
+`mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar`
 
 
 
 
-Data Preparation: brakeTrain.py
-Download the training data from Github here.
+## Data Preparation: brakeTrain.py
+Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
 
 Copy the code below into PySpark and run it there.
 
  
-
-
-
 The LogisticRegressionWithLBFGS.train Spark ML training model requires a LabeledPoint object.  In a real world sample, with actual data coming from our fleet of vehicles, or from the truck manufacturer, we would build that array using data streaming from the truck.  But here we generate random numbers for kilometers driven and brake pad temperature.  
 
 
@@ -217,7 +138,7 @@ lrm.save(job.sc, "/tmp/brakeModel")
 Here is the brakeTrain.py code:
 
 
-
+```
 
 import pandas as pd
 from pyspark.mllib.regression import LabeledPoint
@@ -271,9 +192,9 @@ valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
 
 accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
 
-
+```
  
-Data Ingestion: brakePredict.py
+## Data Ingestion: brakePredict.py
 This job is exposed as a web service by Mist.   
 
 
@@ -281,7 +202,7 @@ This job is exposed as a web service by Mist.
 
  In the constructor you tell the class what method to run.  After that we can then instantiate the class and run the model using train = Train(Mist.Job()).
 
-
+```
 import Mist
 
 
@@ -353,7 +274,7 @@ class Predict:
 
 
 predict = Predict(Mist.Job())
-
+```
 
 Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
 
