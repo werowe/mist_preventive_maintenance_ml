@@ -2,7 +2,8 @@
 
 
 ## Document reference: 
-[Hydrosphere Mist Github](https://github.com/Hydrospheredata/mist)
+1. [Hydrosphere Mist Github](https://github.com/Hydrospheredata/mist)
+2. [Hydrosphere Mist product page](http://hydrosphere.io/mist/)
 
  
 
