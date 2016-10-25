@@ -11,20 +11,20 @@
 ## Table of Contents
 
  
-Spark ML and Hydrosphere Mist Example: Preventive Maintenance	1
-[Business Assessment: Use Case Background]
-Vehicle Fleets and Analytics	2
-Brake Failure Prediction	2
-Brake Pad Maintenance	2
-Model Serving	3
-Data Preparation: brakeTrain.py	4
-Data Ingestion: brakePredict.py	6
-Offline Evaluation: brakeEval.py	8
+1. Spark ML and Hydrosphere Mist Example: Preventive Maintenance	 
+2. Business Assessment: Use Case Background
+3. Vehicle Fleets and Analytics	 
+4. Brake Failure Prediction	 
+5. Brake Pad Maintenance	 
+6. Model Serving	 
+7. Data Preparation: brakeTrain.py	 
+8. Data Ingestion: brakePredict.py	 
+ 	 
 
 
 
 
-
+## Spark ML and Hydrosphere Mist Example: Preventive Maintenance	
 
 Here we provide an example in Python of how to use Hydrosphere Mist with Spark ML (machine learning library).  We take this example from the field of preventive maintenance (PM) as explained below.
 
