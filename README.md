@@ -196,40 +196,11 @@ accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x
 This job is exposed as a web service by Mist.   
 
 
+`curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/jobs --data '{"pyPath":"/home/walker/hydrosphere/brakePredict.py", "parameters":{"heatKM":[200,20000]}, "external_id":"12345678","name":"brakePredict"}'`
 
-
- In the constructor you tell the class what method to run.  After that we can then instantiate the class and run the model using train = Train(Mist.Job()).
+Here is the code:
 
 ```
-import Mist
-
-
-class Train:
-
-
-   def __init__(self, job):
-            job.sendResult(self.runModel(job))
-
-
-Here is how to call the predictive model using CURL:
-
-
-curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/jobs --data '{"pyPath":"/home/walker/hydrosphere/brakePredict.py", "parameters":{"heatKM":[200,20000]}, "external_id":"12345678","name":"brakePredict"}'
-
-
-
-
-Here we take the two arguments heat and kilometers driven that we passed to the program, load the training model that we saved about, and then run the predict function.  That returns a 1 or 0 indicating whether the brakes are worn or not.
-
-
-heat = pylist[0]
-km = pylist[1]
-lrm = LogisticRegressionModel.load(job.sc, "/tmp/brakeModel")
-worn = lrm.predict([heat, km])
-
-
-Here is the brakePredict.py code:
-
 
 import Mist
 import os
