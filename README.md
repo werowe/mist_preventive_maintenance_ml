@@ -13,12 +13,12 @@
  
 1. [Spark ML and Hydrosphere Mist Example: Preventive Maintenance](#1)
 2. [Business Assessment: Use Case Background](#2)
-3. Vehicle Fleets and Analytics	 
-4. Brake Failure Prediction	 
-5. Brake Pad Maintenance	 
-6. Model Serving	 
-7. Data Preparation: brakeTrain.py	 
-8. Data Ingestion: brakePredict.py	 
+3. [Vehicle Fleets and Analytics](#3)	 
+4. [Brake Failure Prediction](#4)	 
+5. [Brake Pad Maintenance](#5)	 
+6. [Model Serving](#6)	 
+7. [Data Preparation: brakeTrain.py](#7)	 
+8. [Data Ingestion: brakePredict.py](#8)	 
  	 
 
 
@@ -45,21 +45,21 @@ Below we discuss the code in depth.  But first we give a use case for why this i
 PM was one of the early adopters of big data analytics and machine learning and IoT (Internet of Things) because it is so simple to conceive and implement for that use case.  Calculating when a machine needs maintenance is a problem that fits neatly into a predictive algorithm. This is because machine wear is a function of time and usage.  
 
 
-## Vehicle Fleets and Analytics
+## <a name="3"></a>Vehicle Fleets and Analytics
 IoT-equipped trucks send data from vehicles using a cellular or satellite signal either as a stream or in bursts.  With IoT, trucks are fit with sensors and GPS trackers that measure heat, vibration, distance travelled, speed, etc.  These are attached to the engine, brakes, transmission, refrigerated trailer, etc.
 
 
 Companies gather and study this data to operate their vehicles in the safest and lowest cost manner possible.  For example, sensors on the engine can tell whether the engine has a problem.  It is the goal of PM to fix a device before it breaks as waiting until it breaks is expensive as the engine, brake assembly, or drive train can be destroyed and the vehicle taken out of service for a longer period of time than if it is properly maintained
 
 
-## Brake Failure Prediction
+## <a name="4"></a>Brake Failure Prediction
 A heavy truck with 18 wheels has a unique preventive maintenance problem to solve, and that is knowing when to change brakes.  Trucks needs to know when to replace their brakes so that they do not have an accident or destroy the brake rotor, which is the metal part of the assembly.  If they wait too long the brake pad will destroy the rotor as metal rubs up against metal.   
 
 
 The driver cannot be expected to check every brake every time they stop.  And if the company just changes brakes based on some preset schedule then they are wasting money, because they might be changing them too often. So it is preferred to write some mathematical or statistical model to predict when brakes should be changed.  
 
 
-## Brake Pad Maintenance
+## <a name="5"></a>Brake Pad Maintenance
 Brake pads are metal shavings held together by a resin. The brake applies pressure to the pad to force it down on the rotor, which is a metal disk connected to a truck’s axles.  The pad is designed to wear out over time.  It has to be softer than the rotor, so that it does not damage the rotor.   When the brake pad wears down, heat will go up because there is more friction.  And the further a vehicle has been driven the more its brakes will have worn down.
 
 
@@ -105,7 +105,7 @@ The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventi
 
 
  
-## Model Serving
+## <a name="6"></a>Model Serving
 We expose the data model as a web service for enterprise applications.  
 
 
@@ -129,7 +129,7 @@ We can run Mist as a Docker image of install it locally.  We install it locally 
 
 
 
-## Data Preparation: brakeTrain.py
+## <a name="7"></a>Data Preparation: brakeTrain.py
 Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
 
@@ -192,7 +192,7 @@ accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x
 
 ```
  
-## Data Ingestion: brakePredict.py
+## <a name="8"></a>Data Ingestion: brakePredict.py
 This job is exposed as a web service by Mist.   
 
 
