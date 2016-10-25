@@ -74,28 +74,98 @@ Brake pads are metal shavings held together by a resin. The brake applies pressu
 We contacted an engineer from Volvo and he verified that this model would work as a teaching exercise as it seems reasonable to correlate heat and distance driven with wear.  To get a more accurate model we would have to use something like this winning paper from IDA Industrial Challenge, which was a competition made by Scana trucking company.
 
 
-There are lots of factors that impact brake wear.  For example, brakes will wear out faster for vehicles that drive down steep hills.  But we make a linear simplified model that takes as its input:
+There are lots of factors that impact brake wear.  For example, brakes will wear out faster for vehicles that drive down steep hills.   
 
 
-wear_rate = x (heat) + y (kilometers driven) + intercept
+We do not have any actual sample data.  So we generated some sample date using this rough model:
 
 
-We can fit this line using the least squares method and linear regression.  Then we use that equation in a binary logistic regression model that returns true (1) if the brakes are considered worn and false (0) if not.
 
 
-We use this linear formula, where we have calculated the coefficients and interests by applying linear regression to sample data:
+z = wear_rate = =(0.003 *heat)+(0.004*kilometers)-78
 
 
-z = wear_rate = (.002 * heat) + (0.0015 * km) - 3
+This shows whether the brakes are worn out given the kilometers driven and the maximum heat generated during gathering the sample.
 
 
-And plug that value into the logistic probability function:
+We plug that value into the logistic probability function:
 
 
 pr =1 / (1 + e-z)
 
 
-The binary logistic model, logit, requires a binary output. So if pr > 50% then logit = 1. Otherwise logit = 0.
+
+
+The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise logit = 0. If worn = 1 then time to change brake pads.
+
+
+
+
+worn
+km
+heat
+z
+pr
+1
+20,000
+240
+2.72
+0.938197
+0
+5,000
+98
+-57.706
+0.000000
+1
+50,000
+140
+122.42
+1.000000
+0
+8,000
+260
+-45.22
+0.000000
+0
+15,966
+263
+-13.347
+0.000002
+1
+27,110
+201
+31.043
+1.000000
+0
+16,018
+189
+-13.361
+0.000002
+1
+28,792
+232
+37.864
+1.000000
+1
+22,002
+201
+10.611
+0.999975
+0
+10,227
+175
+-36.567
+0.000000
+0
+13,663
+183
+-22.799
+0.000000
+0
+8,273
+264
+-44.116
+0.000000
 
 
  
@@ -111,12 +181,11 @@ Obviously we did not write the IoT or interface to the PM system here, since tha
 
 For this tutorial, we write three Python programs:
 
-1) brakeTrain.py to train the model.
+1) brakeTrain.py to train the model and calculate its efficiency..
 2) brakePredict.py to use that model and return a prediction as to whether the brake is probably worn.
-3) brakeEval.py to evaluate the model accuracy.
-
-
-We start Mist first:
+ 
+We can run Mist as a Docker image of install it locally.  We install it locally and run Mist like this:
+ 
 
 
 mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar
@@ -130,39 +199,8 @@ Download the training data from Github here.
 
 Copy the code below into PySpark and run it there.
 
-
-
-pyPath is the path to the Python program you want to execute.
-
-
-The three other parameters are:
  
-An array of values to pass to the program.  Here we send the brake temperature in Celsius and the kilometers driven since the last brake pad replacement.
 
-
-external_id is the ID of requesting client. It could set in order to dispatch the job with an asynchronous response. It is not required with a synchronous HTTP request. 
-
-
-name is the name of the SparkContext to use. This parameter will be removed in the next version of the API since it is ambiguous for developer.
-
-
-Here we explain parts of the code related to the Spark ML logistic regression algorithm and Hydrosphere Mist.  Below is the code so that you can copy and paste this example.  Above that we provide our explanation.
-
-
-You import Hydrosphere Mist and then create a class then tell it whatever method you want to run in the constructor.  Using Mist lets us establish a SparkContext without having to start use spark-submit.
-
-
- In the constructor you tell the class what method to run.  After that we can then instantiate the class and run the model using train = Train(Mist.Job()).
-
-
-import Mist
-
-
-class Train:
-
-
-   def __init__(self, job):
-            job.sendResult(self.runModel(job))
 
 
 The LogisticRegressionWithLBFGS.train Spark ML training model requires a LabeledPoint object.  In a real world sample, with actual data coming from our fleet of vehicles, or from the truck manufacturer, we would build that array using data streaming from the truck.  But here we generate random numbers for kilometers driven and brake pad temperature.  
@@ -236,6 +274,24 @@ accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x
 
  
 Data Ingestion: brakePredict.py
+This job is exposed as a web service by Mist.   
+
+
+
+
+ In the constructor you tell the class what method to run.  After that we can then instantiate the class and run the model using train = Train(Mist.Job()).
+
+
+import Mist
+
+
+class Train:
+
+
+   def __init__(self, job):
+            job.sendResult(self.runModel(job))
+
+
 Here is how to call the predictive model using CURL:
 
 
