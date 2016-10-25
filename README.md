@@ -72,7 +72,7 @@ There are lots of factors that impact brake wear.  For example, brakes will wear
 We do not have any actual sample data.  So we generated some sample date using this rough model:
 
 
-> z = wear_rate = =(0.003 *heat)+(0.004*kilometers)-78
+z = wear_rate = (0.003 *heat)+(0.004*kilometers)-78
 
 
 This shows whether the brakes are worn out given the kilometers driven and the maximum heat generated during gathering the sample.
@@ -81,14 +81,26 @@ This shows whether the brakes are worn out given the kilometers driven and the m
 We plug that value into the logistic probability function:
 
 
-pr =1 / (1 + e-z)
+pr = 1 / (1 + e-z)
 
 
 
 
 The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise logit = 0. If worn = 1 then time to change brake pads.
 
-## Sample Data Goes Here
+The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).  Below is the first line.
+<table>
+<tr>
+<td>worn</td><td>km</td><td>heat</td><td>z</td><td>pr</td>
+</tr>
+
+<tr>
+<td>1</td><td>20,000</td><td>240</td><td>2.72</td><td>0.938197</td>
+</tr>
+
+
+</table>
+
 
 
 
