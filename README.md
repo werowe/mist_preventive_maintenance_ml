@@ -135,20 +135,6 @@ Download the training data from Github [here](https://raw.githubusercontent.com/
 
 Copy the code below into PySpark and run it there.
 
- 
-The LogisticRegressionWithLBFGS.train Spark ML training model requires a LabeledPoint object.  In a real world sample, with actual data coming from our fleet of vehicles, or from the truck manufacturer, we would build that array using data streaming from the truck.  But here we generate random numbers for kilometers driven and brake pad temperature.  
-
-
-We say that the brakes are worn based upon the probability arising from our linear regression model.  The rules of logistic regression tell us to assign the worn variable 1 if the probability is > 50% and 0 otherwise.  So the LabeledPoint object has 1 and 0 values as the first argument (i.e., the labels)  in its constructor and then an array of the heat and kilometers values in the second (i.e., the points).  Then we feed that into the train function and finally save the model on disk for use later.
-
-
-a.append(LabeledPoint(worn,array([heat, km])))
-lrm = LogisticRegressionWithLBFGS.train(job.sc.parallelize(a))
-lrm.save(job.sc, "/tmp/brakeModel")
-
-
-Here is the brakeTrain.py code:
-
 
 ```
 
