@@ -86,7 +86,7 @@ We plug that value into the logistic probability function:
 
 
 
-The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise logit = 0. If worn = 1 then time to change brake pads.
+The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise worn = 0. If worn = 1 then time to change brake pads.
 
 The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).  Below is the first line.
 <table>
