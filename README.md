@@ -2,9 +2,8 @@
 
 
 ## Document reference: 
-1. Hydrosphere Mist install instructions are here
-2. Hydrosphere Mist readme.
-3. Other example Python code is here.
+[Hydrosphere Mist Github](https://github.com/Hydrospheredata/mist)
+
  
 
 
