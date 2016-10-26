@@ -125,11 +125,9 @@ For this tutorial, we write three Python programs:
 1) brakeTrain.py to train the model and calculate its efficiency..
 2) brakePredict.py to use that model and return a prediction as to whether the brake is probably worn.
  
-We can run Mist as a Docker image of install it locally.  We install it locally and run Mist like this:
- 
 
 
-`mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar`
+
 
 
 
@@ -150,24 +148,15 @@ import locale
 import math
 locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' ) 
 
-
-
-
 df = pd.read_csv('/home/walker/hydrosphere/brakedata.csv', sep= ',')
  
 brakeData =  df.ix[:,0:3]
-
-
-
 
 a = [] 
 
 
 def parsePoint(w,k,h):
     return LabeledPoint(worn, [km, heat])
-
-
-
 
 for row in brakeData.itertuples():
 	worn = getattr(row, 'worn')
@@ -179,20 +168,11 @@ for row in brakeData.itertuples():
 
 lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
 
-
 lrm.save(sc, "/tmp/brakeModel")
-
-
-
 
 p = sc.parallelize(a)
 
-
 valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
-
-
-
-
 accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
 
 ```
@@ -261,6 +241,8 @@ cd mist
 sbt -DsparkVersion=2.0.0 assembly 
 ```
 
+Now [configure the route and start Mist](#10).
+
 ## <a name="9B"></a> Run Mist as Docker Image
 
 Deploy Mist and run it as a Docker image like this:
@@ -274,9 +256,20 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 
 ./config/router.conf
 
+```preventineMaintance = {
+    path = '/home/walker/hydrosphere/brakePredict.py', 
+    className = Predict',
+  namespace = 'production' 
+}
+
+```
+
+
+`mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar`
+
 ## <a name="11"></a> Run Code using HTTP
 
- `curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/jobs --data '{"pyPath":"/home/walker/hydrosphere/brakePredict.py", "parameters":{"heatKM":[200,20000]}, "external_id":"12345678","name":"brakePredict"}'`
+ `curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/api/preventineMaintance --data '{ "heat":200,"KM": 20000}'`
  
  Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
 
