@@ -18,7 +18,10 @@
 5. [Brake Pad Maintenance](#5)	 
 6. [Model Serving](#6)	 
 7. [Data Preparation: brakeTrain.py](#7)	 
-8. [Data Ingestion: brakePredict.py](#8)	 
+8. [Data Ingestion: brakePredict.py](#8)
+9. [Start Mist](#9)
+10. [Create Mist Route](#10)
+11. [Run Code](#11)
  	 
 
 
@@ -251,10 +254,23 @@ Then it responds with the predicted value via the return ("brake is worn=", worn
 {"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}
 
 
+## <a name="9"></a> Start Mist as Docker Image
 
+Deploy Mist and run it as a Docker image like this:
 
+```
+docker run -d --name mosquitto-$SPARK_VERSION ansi/mosquitto
+docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrosphere/mist:master-$SPARK_VERSION mist
+```
+
+## <a name="10"></a> Create Mist Route
+
+./config/router.conf
+
+## <a name="11"></a> Run Code
+
+Edit
+ ./config/router.conf
  
-
-
 
 
