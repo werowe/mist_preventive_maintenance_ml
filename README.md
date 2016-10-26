@@ -19,9 +19,11 @@
 6. [Model Serving](#6)	 
 7. [Data Preparation: brakeTrain.py](#7)	 
 8. [Data Ingestion: brakePredict.py](#8)
-9. [Start Mist](#9)
-10. [Create Mist Route](#10)
-11. [Run Code](#11)
+9. [Run Mist Locally](#9A)
+10. [Run Mist using Docker](#9B)
+11. [Create Mist Route](#10)
+12. [Run Code using HTTP](#11)
+13. [Run Code using MQ](#12)
  	 
 
 
@@ -254,7 +256,15 @@ Then it responds with the predicted value via the return ("brake is worn=", worn
 {"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}
 
 
-## <a name="9"></a> Start Mist as Docker Image
+## <a name="9A"></a> ### Run Mist Locally
+
+```
+git clone https://github.com/hydrospheredata/mist.git
+cd mist
+sbt -DsparkVersion=2.0.0 assembly 
+```
+
+## <a name="9B"></a> Run Mist as Docker Image
 
 Deploy Mist and run it as a Docker image like this:
 
@@ -267,10 +277,9 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 
 ./config/router.conf
 
-## <a name="11"></a> Run Code
+## <a name="11"></a> Run Code using HTTP
 
-Edit
- ./config/router.conf
  
-
+ 
+## <a name="11"></a> Run Code using MQ
 
