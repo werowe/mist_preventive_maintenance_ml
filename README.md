@@ -201,7 +201,7 @@ accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x
 This job is exposed as a web service by Mist.   
 
 
-`curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/jobs --data '{"pyPath":"/home/walker/hydrosphere/brakePredict.py", "parameters":{"heatKM":[200,20000]}, "external_id":"12345678","name":"brakePredict"}'`
+
 
 Here is the code:
 
@@ -250,10 +250,7 @@ class Predict:
 predict = Predict(Mist.Job())
 ```
 
-Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
 
-
-{"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}
 
 
 ## <a name="9A"></a> ### Run Mist Locally
@@ -279,7 +276,17 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 
 ## <a name="11"></a> Run Code using HTTP
 
+ `curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2003/jobs --data '{"pyPath":"/home/walker/hydrosphere/brakePredict.py", "parameters":{"heatKM":[200,20000]}, "external_id":"12345678","name":"brakePredict"}'`
  
+ Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
+
+
+`
+{"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}`
  
 ## <a name="11"></a> Run Code using MQ
+
+```
+mosquitto_pub -h mist_mqtt_host -p mist_mqtt_port -m '{"path": "/path_to_jar/mist_examples.jar", "className": "SimpleContext$", "parameters": {"digits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]}, "external_id": "12345678", "namespace": "foo"}'  -t 'foo'
+```
 
