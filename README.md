@@ -126,12 +126,6 @@ For this tutorial, we write three Python programs:
 2) brakePredict.py to use that model and return a prediction as to whether the brake is probably worn.
  
 
-
-
-
-
-
-
 ## <a name="7"></a>Data Preparation: brakeTrain.py
 Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
@@ -265,7 +259,8 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 ```
 
 
-`mist.sh master --config /home/walker/mist/mist/configs/mist.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.4.0.jar`
+`./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
+`
 
 ## <a name="11"></a> Run Code using HTTP
 
