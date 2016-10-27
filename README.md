@@ -215,7 +215,7 @@ class Predict(MistJob):
 
 
 
-## <a name="9A"></a> ### Run Mist Locally
+## <a name="9A"></a> Run Mist Locally
 
 ```
 git clone https://github.com/hydrospheredata/mist.git
@@ -238,7 +238,8 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 
 ./config/router.conf
 
-```preventineMaintance = {
+```
+preventineMaintance = {
     path = "/home/walker/hydrosphere/brakePredict.py" 
     className = "Predict"
   namespace = "production" 
