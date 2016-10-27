@@ -1,4 +1,4 @@
-import mist
+from mist.mist_job import MistJob
 import os
 import numpy as np
 import pandas as pd
@@ -7,14 +7,10 @@ from numpy import array
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionModel
 
-class Predict:
+class Predict(MistJob):
  
-
-    def __init__(self, job):
-        job.sendResult(self.runModel(job))
-
-    def runModel(self, job):
-        val = job.parameters.values()
+    def do_stuff(self, parameters):
+        val = parameters.values()
         list = val.head()
         size = list.size()
         pylist = []
@@ -27,11 +23,10 @@ class Predict:
 
         heat = pylist[0]
         km = pylist[1]
-        lrm = LogisticRegressionModel.load(job.sc, "/tmp/brakeModel")
+        lrm = LogisticRegressionModel.load(self.context, "/tmp/brakeModel")
         worn = lrm.predict([km,heat])
         return ("brake is worn=", worn)
       
 
-predict = Predict(mist.Job())
 
  
