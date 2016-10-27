@@ -216,6 +216,7 @@ class Predict(MistJob):
 
 
 ## <a name="9A"></a> Run Mist Locally
+You can run Mist locally or as a Docker image.
 
 ```
 git clone https://github.com/hydrospheredata/mist.git
