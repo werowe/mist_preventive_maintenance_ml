@@ -253,6 +253,7 @@ full path to that in default.conf:
 
 `mist.http.router-config-path = "/home/walker/mist/mist/configs/router.conf"`
 
+Now start Mist.
 
 `./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
 `
