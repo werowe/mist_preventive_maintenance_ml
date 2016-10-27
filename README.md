@@ -23,7 +23,7 @@
 10. [Run Mist using Docker](#9B)
 11. [Create Mist Route](#10)
 12. [Run Code using HTTP](#11)
-13. [Run Code using MQ](#12)
+
  	 
 
 
