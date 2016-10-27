@@ -181,7 +181,7 @@ Here is the code:
 
 ```
 
-import Mist
+from mist.mist_job import MistJob
 import os
 import numpy as np
 import pandas as pd
@@ -190,17 +190,10 @@ from numpy import array
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.classification import LogisticRegressionModel
 
-
-class Predict:
+class Predict(MistJob):
  
-
-
-    def __init__(self, job):
-        job.sendResult(self.runModel(job))
-
-
-    def runModel(self, job):
-        val = job.parameters.values()
+    def do_stuff(self, parameters):
+        val = parameters.values()
         list = val.head()
         size = list.size()
         pylist = []
@@ -211,17 +204,12 @@ class Predict:
             list = list.tail()
 
 
-
-
         heat = pylist[0]
         km = pylist[1]
-        lrm = LogisticRegressionModel.load(job.sc, "/tmp/brakeModel")
-        worn = lrm.predict([heat, km])
+        lrm = LogisticRegressionModel.load(self.context, "/tmp/brakeModel")
+        worn = lrm.predict([km,heat])
         return ("brake is worn=", worn)
-      
 
-
-predict = Predict(Mist.Job())
 ```
 
 
@@ -251,12 +239,18 @@ docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrospher
 ./config/router.conf
 
 ```preventineMaintance = {
-    path = '/home/walker/hydrosphere/brakePredict.py', 
-    className = Predict',
-  namespace = 'production' 
+    path = "/home/walker/hydrosphere/brakePredict.py" 
+    className = "Predict"
+  namespace = "production" 
 }
 
+
 ```
+
+If you get any error about RouteConfig$RouterConfigurationMissingError then it cannot find your router.conf so put the
+full path to that in default.conf:
+
+`mist.http.router-config-path = "/home/walker/mist/mist/configs/router.conf"`
 
 
 `./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
