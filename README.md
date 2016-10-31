@@ -6,20 +6,21 @@
 2. [Hydrosphere Mist product page](http://hydrosphere.io/mist/)
 
  
-
-
 ## Table of Contents
 
  
 1. [Spark ML and Hydrosphere Mist Example: Preventive Maintenance](#1)
 2. [Business Assessment: Use Case Background](#2)
-1. [Vehicle Fleets and Analytics](#3)	 
-2. [Brake Failure Prediction](#4)	 
-3. [Brake Pad Maintenance](#5)	 
-4. [Ingest data](#6)	 
-5. [Prepare data](#7)	 
-6. [Train the model](#8)
-7. [Expose the Model as a Web Service](#8a)
+3. [Vehicle Fleets and Analytics](#3)	 
+4. [Brake Failure Prediction](#4)	 
+5. [Brake Pad Maintenance](#5)	 
+6. [Ingest data](#6)	 
+7. [Prepare data](#7)	 
+8. [Train the model](#8)
+9. [Test the model](#9)
+10. [Expose the Model as a Web Service](#10)
+11. [Serve the Model](#11)
+12. [Complete Code](#11)
  
 
 ## <a name="1"></a>Spark ML and Hydrosphere Mist Example: Preventive Maintenance	
@@ -103,7 +104,7 @@ The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventi
 
 
  
-## <a name="6"></a>Model Serving
+## <a name="6"></a>Ingest Data
 We expose the data model as a web service for enterprise applications.  
 
 
@@ -119,12 +120,29 @@ For this tutorial, we write three Python programs:
 2) brakePredict.py to use that model and return a prediction as to whether the brake is probably worn.
  
 
-## <a name="7"></a>Data Preparation: brakeTrain.py
+## <a name="7"></a>Prepare Data
 Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
 
 Copy the code below into PySpark and run it there.
 
+
+ 
+## <a name="8"></a>Train the Model
+This job is exposed as a web service by Mist.   
+
+## <a name="9"></a>Test the Model
+
+## <a name="10"></a>Expose the Model as a Web Service
+
+## <a name="11"></a>Serve the Model
+
+## <a name="12"></a>Complete Code
+
+Here is the code:
+
+
+** BrakeTrain.py
 
 ```
 
@@ -163,14 +181,7 @@ valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
 accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
 
 ```
- 
-## <a name="8"></a>Data Ingestion: brakePredict.py
-This job is exposed as a web service by Mist.   
-
-
-
-
-Here is the code:
+** BrakePredict.py
 
 ```
 
