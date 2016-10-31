@@ -93,8 +93,8 @@ The binary logistic model, logit, requires a binary output. So if pr > 50% then 
   
 For this tutorial, we write two Python programs.  The code for both is located at the bottom of this page.
 
-1) brakeTrain.py to ingest and prepare the data, train the model, and calculate its accuracy.  We run this program in pyspark.
-2) brakePredict.py expose that model as a web service to return a prediction as to whether the brakeworn.  For this tutorial we run this code using curl.
+1. brakeTrain.py to ingest and prepare the data, train the model, and calculate its accuracy.  We run this program in pyspark.
+2. brakePredict.py expose that model as a web service to return a prediction as to whether the brakeworn.  For this tutorial we run this code using curl.
 
 First we look at brakeTrain.py.
 
