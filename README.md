@@ -25,19 +25,9 @@
 
 ## <a name="1"></a>Spark ML and Hydrosphere Mist Example: Preventive Maintenance	
 
-Here we provide an example in Python of how to use Hydrosphere Mist with Spark ML (machine learning library).  We take this example from the field of preventive maintenance (PM) as explained below.
+Here we provide an example in Python of how to use Hydrosphere Mist with Spark ML (machine learning library).  Mist lets us expose a model as a web service. 
 
-
-This is a tutorial.  Here is what you will learn:
- 
-Use Hydrosphere Mist to run a Spark job.
-Create and train a logistic regression model using Spark ML and Python.
-Write a webservice in Python using Hydrosphere Mist that predicts when brakes need to be replaced on a heavy truck.
-Train model and save it.  Then use it for prediction queries.
-Evaluate the model for accuracy. 
-
-
-Below we discuss the code in depth.  But first we give a use case for why this is needed.
+We take this example from the field of preventive maintenance (PM) as explained below.  Below we discuss the code in depth.  But first we give a use case for why this is needed.
 
 
 ## <a name="2"></a>Business Assessment: Use Case Background
@@ -45,7 +35,7 @@ PM was one of the early adopters of big data analytics and machine learning and 
 
 
 ## <a name="3"></a>Vehicle Fleets and Analytics
-IoT-equipped trucks send data from vehicles using a cellular or satellite signal either as a stream or in bursts.  With IoT, trucks are fit with sensors and GPS trackers that measure heat, vibration, distance travelled, speed, etc.  These are attached to the engine, brakes, transmission, refrigerated trailer, etc.
+IoT-equipped trucks send data from vehicles using a cellular or satellite signal either as a stream or in bursts.  With IoT, trucks are fit with sensors and GPS trackers that measure heat, vibration, distance travelled, speed, etc.  These sensors are attached to the engine, brakes, transmission, refrigerated trailer, etc.
 
 
 Companies gather and study this data to operate their vehicles in the safest and lowest cost manner possible.  For example, sensors on the engine can tell whether the engine has a problem.  It is the goal of PM to fix a device before it breaks as waiting until it breaks is expensive as the engine, brake assembly, or drive train can be destroyed and the vehicle taken out of service for a longer period of time than if it is properly maintained
@@ -62,7 +52,7 @@ The driver cannot be expected to check every brake every time they stop.  And if
 Brake pads are metal shavings held together by a resin. The brake applies pressure to the pad to force it down on the rotor, which is a metal disk connected to a truck’s axles.  The pad is designed to wear out over time.  It has to be softer than the rotor, so that it does not damage the rotor.   When the brake pad wears down, heat will go up because there is more friction.  And the further a vehicle has been driven the more its brakes will have worn down.
 
 
-We contacted an engineer from Volvo and he verified that this model would work as a teaching exercise as it seems reasonable to correlate heat and distance driven with wear.  To get a more accurate model we would have to use something like this winning paper from IDA Industrial Challenge, which was a competition made by Scana trucking company.
+We contacted an engineer from Volvo and he verified that this model would work as a teaching exercise as it seems reasonable to correlate heat and distance driven with wear.  To get a more accurate model we would have to use something like data from the [IDA Industrial Challenge](https://ida2016.blogs.dsv.su.se/?page_id=1387), which was a competition made by Scana trucking company.
 
 
 There are lots of factors that impact brake wear.  For example, brakes will wear out faster for vehicles that drive down steep hills.   
@@ -85,7 +75,7 @@ We plug that value into the logistic probability function:
 
 
 
-The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise worn = 0. If worn = 1 then time to change brake pads.
+The binary logistic model generates a binary output, which we will call worn. So if pr > 50% then worn = 1. Otherwise worn = 0. If worn = 1 then it is time to change brake pads.
 
 
 
@@ -93,10 +83,10 @@ The binary logistic model, logit, requires a binary output. So if pr > 50% then 
   
 For this tutorial, we write two Python programs.  The code for both is located at the bottom of this page.
 
-1. brakeTrain.py to ingest and prepare the data, train the model, and calculate its accuracy.  We run this program in pyspark.
-2. brakePredict.py expose that model as a web service to return a prediction as to whether the brake is worn on now.  For this tutorial, we run this code using curl.
+1. ***brakeTrain.py** to ingest and prepare the data, train the model, and calculate its accuracy.  
+2. **brakePredict.py** uses Mist to expose the model as a web service to return a prediction as to whether the brake is worn. 
 
-First we look at brakeTrain.py.
+First we look at brakeTrain.py.  We copy that code into pyspark and run it there.  The pyspark interactive Spark shell gives us a SparkContext without having to code that.  
 
 The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).  Below is the first line.
 
@@ -110,9 +100,6 @@ The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventi
 </tr>
 
 </table>
-
-
-Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
 We read this data into a Pandas data frame and then select only the first three columns: whether the brake is worn, kilometers, brake rotor heat.
 
@@ -143,9 +130,9 @@ for row in brakeData.itertuples():
 
 
 ## <a name="8"></a>Train the Model
- Now we train the model by passing that array into LogisticRegressionWithLBFGS.trainand then save the model to disk.
+Now we train the model by passing that array into LogisticRegressionWithLBFGS.train. Then we save the model to disk so that the web service can use it.
 
-Once the model is created, we can call the predict() method, which is what we do when we expose the model as a web service.
+Once the model lrm is created, we can call the lrm.predict() method.
 
 ```
 lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
@@ -154,7 +141,7 @@ lrm.save(sc, "/tmp/brakeModel")
 
 
 ## <a name="9"></a>Test the Model
-To test the model we take the training data and then run the prediction over each data point.  We then count how many correct guesses there are and divide that my the sample size.  That calculates the model accuracy.
+To test the model we take the training data and then run the prediction over each data point in the sample data.  We then count how many correct predictions there are and divide that by the sample size.  That calculates the model accuracy.
 
 ```
 p = sc.parallelize(a)
@@ -187,17 +174,16 @@ class Predict(MistJob):
 
 
 ## <a name="11"></a>Serve the Model
-Here is how to call the prediction web service from an external application.  To train the model we copy the code brakePredict.py and run it there.  We use CURL to run brakePredict.py. 
+Here is how to call the prediction web service from an external application.  We use CURL to run brakePredict.py. 
 
 First we need to install and configure Hydropshere Mist.
 
 
-*Configure and Run Mist*  
+**Configure and Run Mist**  
 You can run Mist locally or as a Docker image.
 
 
-Download and compile Mist (or you can run it as a Docker image.)
-
+Download and compile Mist:
 ```
 git clone https://github.com/hydrospheredata/mist.git
 cd mist
@@ -210,10 +196,10 @@ Create the Mist route by editing:
 
 The fields are:
 
-1. *preventineMaintance* is the URL localhost:2004/api/preventineMaintance 
-2. *path* is the location of the Python code
-3. *className* is the class in the Python program that implements Mist
-4. *namespace* is the SparkContext.  It can be any name.
+1. **preventineMaintance** is the URL localhost:2004/api/preventineMaintance 
+2. **path** is the location of the Python code
+3. **className** is the class in the Python program that implements Mist
+4. **namespace** is the SparkContext.  It can be any name.
 
 
 ```
@@ -226,17 +212,16 @@ preventineMaintance = {
 
 ```
 
-If you get any error about RouteConfig$RouterConfigurationMissingError then it cannot find your router.conf so put the
-full path to that in default.conf:
+IIn config/router.conf put the full path to that in default.conf:
 
 `mist.http.router-config-path = "/home/walker/mist/mist/configs/router.conf"`
 
-Now start Mist.
+Now start Mist changing the version number to match what you have installed:
 
 `./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
 `
 
-Run the code.
+Run the web service:
 
 `curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2004/api/preventineMaintance --data '{"heatKM":[200,1000]}'`
 
@@ -244,9 +229,6 @@ The port number must agree with the mist.http.port = 2004 in default.conf.
  
 Then it responds with the predicted value via the return ("brake is worn=", worn) statement. It loads the training model and then uses lrm.predict([km,heat]) to make the prediction.
 
-
-`
-PUT CURL HERE`
 
 ## <a name="12"></a>Complete Code
 
