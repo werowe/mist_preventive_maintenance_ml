@@ -20,7 +20,7 @@
 9. [Test the model](#9)
 10. [Expose the Model as a Web Service](#10)
 11. [Serve the Model](#11)
-12. [Complete Code](#11)
+12. [Complete Code](#12)
  
 
 ## <a name="1"></a>Spark ML and Hydrosphere Mist Example: Preventive Maintenance	
