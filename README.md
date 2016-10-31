@@ -94,7 +94,7 @@ The binary logistic model, logit, requires a binary output. So if pr > 50% then 
 For this tutorial, we write two Python programs.  The code for both is located at the bottom of this page.
 
 1. brakeTrain.py to ingest and prepare the data, train the model, and calculate its accuracy.  We run this program in pyspark.
-2. brakePredict.py expose that model as a web service to return a prediction as to whether the brakeworn.  For this tutorial we run this code using curl.
+2. brakePredict.py expose that model as a web service to return a prediction as to whether the brake is worn on now.  For this tutorial, we run this code using curl.
 
 First we look at brakeTrain.py.
 
@@ -123,7 +123,7 @@ brakeData =  df.ix[:,0:3]
 ```
 
 ## <a name="7"></a>Prepare Data
-The Spark ML LogisticRegressionWithLBFGS algorithm requires that we put the data into an iterable object of labels and points.  So we have an array of LabeledPoint objects.  The Label indicates whether the brake is worn (1) or not (0).  The Points are the kilometers (km) and temperature (heat).
+The Spark ML LogisticRegressionWithLBFGS algorithm requires that we put the data into an iterable object of Labels and Points.  So we have an array of LabeledPoint objects.  The Label is the result of logistic regression.  In this case it indicates whether the brake is worn (1) or not (0).  The Points are the kilometers (km) and temperature (heat).
 
 
 ```
@@ -143,7 +143,7 @@ for row in brakeData.itertuples():
 
 
 ## <a name="8"></a>Train the Model
-Now we train the model by passing that array into and then save the model to disk.
+ Now we train the model by passing that array into LogisticRegressionWithLBFGS.trainand then save the model to disk.
 
 Once the model is created, we can call the predict() method, which is what we do when we expose the model as a web service.
 
@@ -204,9 +204,17 @@ cd mist
 sbt -DsparkVersion=2.0.0 assembly 
 ```
 
-Create Mist route.
+Create the Mist route by editing:
 
 `vi config/router.conf`
+
+The fields are:
+
+1. *preventineMaintance* is the URL localhost:2004/api/preventineMaintance 
+2. *path* is the location of the Python code
+3. *className* is the class in the Python program that implements Mist
+4. *namespace* is the SparkContext.  It can be any name.
+
 
 ```
 preventineMaintance = {
@@ -234,11 +242,11 @@ Run the code.
 
 The port number must agree with the mist.http.port = 2004 in default.conf.
  
-Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
+Then it responds with the predicted value via the return ("brake is worn=", worn) statement. It loads the training model and then uses lrm.predict([km,heat]) to make the prediction.
 
 
 `
-{"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}`
+PUT CURL HERE`
 
 ## <a name="12"></a>Complete Code
 
