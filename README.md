@@ -87,7 +87,19 @@ We plug that value into the logistic probability function:
 
 The binary logistic model, logit, requires a binary output. So if pr > 50% then worn = 1. Otherwise worn = 0. If worn = 1 then time to change brake pads.
 
+
+
+## <a name="6"></a>Ingest Data
+  
+For this tutorial, we write two Python programs.  The code for both is located at the bottom of this page.
+
+1) brakeTrain.py to ingest and prepare the data, train the model, and calculate its accuracy.  We run this program in pyspark.
+2) brakePredict.py expose that model as a web service to return a prediction as to whether the brakeworn.  For this tutorial we run this code using curl.
+
+First we look at brakeTrain.py.
+
 The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).  Below is the first line.
+
 <table>
 <tr>
 <td>worn</td><td>km</td><td>heat</td><td>z</td><td>pr</td>
@@ -97,46 +109,70 @@ The sample data is [here](https://raw.githubusercontent.com/werowe/mist_preventi
 <td>1</td><td>20,000</td><td>240</td><td>2.72</td><td>0.938197</td>
 </tr>
 
-
 </table>
 
 
-
-
- 
-## <a name="6"></a>Ingest Data
-We expose the data model as a web service for enterprise applications.  
-
-
-To actually deploy this for a trucking company, a truck fleet manager would use IoT to upload truck data to a web service and call the model to get a prediction. The enterprise application would create a maintenance work order in the preventive maintenance (PM) system when a brake pad needs replacing and notifies the driver.  Then the driver returns to the truck headquarters for repairs or goes to a repair shop.
-
-
-Obviously we did not write the IoT or interface to the PM system here, since that would be different for different companies and require an IoT cloud, truck, and ERP system.
-
-
-For this tutorial, we write three Python programs:
-
-1) brakeTrain.py to train the model and calculate its efficiency..
-2) brakePredict.py to use that model and return a prediction as to whether the brake is probably worn.
- 
-
-## <a name="7"></a>Prepare Data
 Download the training data from Github [here](https://raw.githubusercontent.com/werowe/mist_preventive_maintenance_ml/master/brakedata.csv).
 
+We read this data into a Pandas data frame and then select only the first three columns: whether the brake is worn, kilometers, brake rotor heat.
 
-Copy the code below into PySpark and run it there.
-
-
+```
+df = pd.read_csv('/home/walker/hydrosphere/brakedata.csv', sep= ',')
  
+brakeData =  df.ix[:,0:3]
+```
+
+## <a name="7"></a>Prepare Data
+The Spark ML LogisticRegressionWithLBFGS algorithm requires that we put the data into an iterable object of labels and points.  So we have an array of LabeledPoint objects.  The Label indicates whether the brake is worn (1) or not (0).  The Points are the kilometers (km) and temperature (heat).
+
+
+```
+a = [] 
+
+def parsePoint(w,k,h):
+    return LabeledPoint(worn, [km, heat])
+
+
+for row in brakeData.itertuples():
+	worn = getattr(row, 'worn')
+	km = locale.atof(getattr(row, 'km'))
+	heat = getattr(row,'heat')
+	lp = parsePoint (worn, km, heat)
+	a.append(lp)
+```
+
+
 ## <a name="8"></a>Train the Model
-This job is exposed as a web service by Mist.   
+Now we train the model by passing that array into and then save the model to disk.
+
+Once the model is created, we can call the predict() method, which is what we do when we expose the model as a web service.
+
+```
+lrm = LogisticRegressionWithLBFGS.train(sc.parallelize(a))
+lrm.save(sc, "/tmp/brakeModel")
+```
+
 
 ## <a name="9"></a>Test the Model
+To test the model we take the training data and then run the prediction over each data point.  We then count how many correct guesses there are and divide that my the sample size.  That calculates the model accuracy.
+
+```
+p = sc.parallelize(a)
+
+valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
+
+
+accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
+```
+ 
 
 ## <a name="10"></a>Expose the Model as a Web Service
 
-## <a name="11"></a>Serve the Model
+Finally we expose the model as a web service.  That code is in the second program, brakePredict.py.
 
+
+## <a name="11"></a>Serve the Model
+Here is how to call the prediction web service from an external application.  We use CURL.  First we need to install and configure Hydropshere Mist.
 
 
 ** Configure and Run Mist  
