@@ -170,9 +170,26 @@ accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x
 
 Finally we expose the model as a web service.  That code is in the second program, brakePredict.py.
 
+The key pieces of the code are to import Mist and then create a class derived from MistJob.  Then implement the method do_stuff().  Then read the parameters and return the results with the return statement.  There is no need instantiate the Predict object.  Mist will do that.
+
+```
+from mist.mist_job import MistJob
+
+class Predict(MistJob):
+ 
+    def do_stuff(self, parameters):
+        val = parameters.values()
+       
+        return ("brake is worn=", worn)
+
+```
+
+
 
 ## <a name="11"></a>Serve the Model
-Here is how to call the prediction web service from an external application.  We use CURL.  First we need to install and configure Hydropshere Mist.
+Here is how to call the prediction web service from an external application.  To train the model we copy the code brakePredict.py and run it there.  We use CURL to run brakePredict.py. 
+
+First we need to install and configure Hydropshere Mist.
 
 
 ** Configure and Run Mist  
