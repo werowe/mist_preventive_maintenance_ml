@@ -16,25 +16,11 @@
 1. [Vehicle Fleets and Analytics](#3)	 
 2. [Brake Failure Prediction](#4)	 
 3. [Brake Pad Maintenance](#5)	 
-3. [Model Serving](#6)	 
-4. [Data Preparation: brakeTrain.py](#7)	 
-5. [Data Ingestion: brakePredict.py](#8)
-6. [Run Mist Locally](#9A)
-10. [Run Mist using Docker](#9B)
-11. [Create Mist Route](#10)
-12. [Run Code using HTTP](#11)
-
- 	 
-	 
-	 1) Ingest data
-2) Prepare data 
-3) Train the model
-4) Test the model
-5) Expose the model as a web service - only here you need Mist
-6) Serve the model - i.e. call the prediction web service from external application
-
-
-
+4. [Ingest data](#6)	 
+5. [Prepare data](#7)	 
+6. [Train the model](#8)
+7. [Expose the Model as a Web Service](#8a)
+ 
 
 ## <a name="1"></a>Spark ML and Hydrosphere Mist Example: Preventive Maintenance	
 
