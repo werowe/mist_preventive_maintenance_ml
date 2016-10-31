@@ -192,7 +192,7 @@ Here is how to call the prediction web service from an external application.  To
 First we need to install and configure Hydropshere Mist.
 
 
-** Configure and Run Mist  
+*Configure and Run Mist*  
 You can run Mist locally or as a Docker image.
 
 
@@ -253,7 +253,7 @@ PUT CURL HERE`
 Here is the code:
 
 
-** BrakeTrain.py
+*BrakeTrain.py*
 
 ```
 
@@ -292,7 +292,7 @@ valuesAndPreds = p.map(lambda p: (p.label, lrm.predict(p.features)))
 accurate = 1 - valuesAndPreds.map(lambda (v, p): math.fabs(v-p)).reduce(lambda x, y: x + y) / valuesAndPreds.count()
 
 ```
-** BrakePredict.py
+*BrakePredict.py*
 
 ```
 
