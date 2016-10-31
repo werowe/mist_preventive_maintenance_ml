@@ -13,9 +13,9 @@
  
 1. [Spark ML and Hydrosphere Mist Example: Preventive Maintenance](#1)
 2. [Business Assessment: Use Case Background](#2)
-⋅⋅* [Vehicle Fleets and Analytics](#3)	 
-⋅⋅* [Brake Failure Prediction](#4)	 
-⋅⋅* [Brake Pad Maintenance](#5)	 
+1. [Vehicle Fleets and Analytics](#3)	 
+2. [Brake Failure Prediction](#4)	 
+3. [Brake Pad Maintenance](#5)	 
 3. [Model Serving](#6)	 
 4. [Data Preparation: brakeTrain.py](#7)	 
 5. [Data Ingestion: brakePredict.py](#8)
