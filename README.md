@@ -137,6 +137,56 @@ This job is exposed as a web service by Mist.
 
 ## <a name="11"></a>Serve the Model
 
+
+
+** Configure and Run Mist  
+You can run Mist locally or as a Docker image.
+
+
+Download and compile Mist (or you can run it as a Docker image.)
+
+```
+git clone https://github.com/hydrospheredata/mist.git
+cd mist
+sbt -DsparkVersion=2.0.0 assembly 
+```
+
+Create Mist route.
+
+`vi config/router.conf`
+
+```
+preventineMaintance = {
+    path = "/home/walker/hydrosphere/brakePredict.py" 
+    className = "Predict"
+  namespace = "production" 
+}
+
+
+```
+
+If you get any error about RouteConfig$RouterConfigurationMissingError then it cannot find your router.conf so put the
+full path to that in default.conf:
+
+`mist.http.router-config-path = "/home/walker/mist/mist/configs/router.conf"`
+
+Now start Mist.
+
+`./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
+`
+
+Run the code.
+
+`curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2004/api/preventineMaintance --data '{"heatKM":[200,1000]}'`
+
+The port number must agree with the mist.http.port = 2004 in default.conf.
+ 
+Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
+
+
+`
+{"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}`
+
 ## <a name="12"></a>Complete Code
 
 Here is the code:
@@ -218,62 +268,6 @@ class Predict(MistJob):
 
 
 
-
-## <a name="9A"></a> Run Mist Locally
-You can run Mist locally or as a Docker image.
-
-```
-git clone https://github.com/hydrospheredata/mist.git
-cd mist
-sbt -DsparkVersion=2.0.0 assembly 
-```
-
-Now [configure the route and start Mist](#10).
-
-## <a name="9B"></a> Run Mist as Docker Image
-
-Deploy Mist and run it as a Docker image like this:
-
-```
-docker run -d --name mosquitto-$SPARK_VERSION ansi/mosquitto
-docker run -d --link mosquitto-$SPARK_VERSION:mosquitto -p 2003:2003  hydrosphere/mist:master-$SPARK_VERSION mist
-```
-
-## <a name="10"></a> Create Mist Route
-
-./config/router.conf
-
-```
-preventineMaintance = {
-    path = "/home/walker/hydrosphere/brakePredict.py" 
-    className = "Predict"
-  namespace = "production" 
-}
-
-
-```
-
-If you get any error about RouteConfig$RouterConfigurationMissingError then it cannot find your router.conf so put the
-full path to that in default.conf:
-
-`mist.http.router-config-path = "/home/walker/mist/mist/configs/router.conf"`
-
-Now start Mist.
-
-`./mist start master --config /home/walker/mist/mist/configs/default.conf --jar /home/walker/mist/mist/target/scala-2.11/mist-assembly-0.5.0.jar
-`
-
-## <a name="11"></a> Run Code using HTTP
-
-`curl --header "Content-Type: application/json" -X POST http://127.0.0.1:2004/api/preventineMaintance --data '{"heatKM":[200,1000]}'`
-
-The port number must agree with the mist.http.port = 2004 in default.conf.
- 
- Then it responds with the predicted value via the return ("brake is worn=", worn) statement.
-
-
-`
-{"success":true,"payload":{"result":["brake is worn=",1]},"errors":[],"request":{"pyPath":"/home/walker/hydrosphere/brakePredict.py","name":"brakePredict","parameters":{"heatKM":[200,20000]},"external_id":"12345678"}}`
  
 
 
