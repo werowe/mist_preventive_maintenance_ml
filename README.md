@@ -1,5 +1,7 @@
 # Spark ML and Hydrosphere Mist Example: Preventive Maintenance
-
+by
+Walker Rowe
+werowe@walkerrowe.com
 
 ## Document reference: 
 1. [Hydrosphere Mist Github](https://github.com/Hydrospheredata/mist)
